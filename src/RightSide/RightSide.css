@@ -1,0 +1,42 @@
+.right-container {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .row-80 {
+    flex: 8;
+  }
+  
+  .row-20 {
+    flex: 2;
+  }
+
+  /* RightSide.css */
+
+.play-button {
+    background-color: #4caf50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+  }
+  
+  .pause-button {
+    background-color: #f44336;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+  }
+  
+  

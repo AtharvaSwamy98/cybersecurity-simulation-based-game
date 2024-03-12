@@ -5,16 +5,7 @@ import { MdDone } from "react-icons/md";
 import { Draggable } from "react-beautiful-dnd";
 import { Todo } from "./Modules";
 
-const SingleTodo: React.FC<{
-  index: number;
-  todo: Todo;
-  todos: Array<Todo>;
-  setTodos: React.Dispatch<React.SetStateAction<Array<Todo>>>;
-}> = ({ index, todo, todos, setTodos }) => {
-
-
-
-
+const SingleTodo = ({ index, todo }) => {
 
   return (
     <Draggable draggableId={todo?.id.toString()} index={index}>
@@ -29,7 +20,7 @@ const SingleTodo: React.FC<{
           <img src={todo?.image} alt={todo?.todo} className="card-image" />
           <div className="card-content">
             <h2 className="card-title">{todo?.todo}</h2>
-            <h2 className="card-title">{todo?.price}</h2>
+            <h2 className="card-title">${todo?.price}</h2>
           </div>
         </div>
          

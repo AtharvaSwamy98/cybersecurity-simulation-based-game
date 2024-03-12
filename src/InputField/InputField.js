@@ -1,13 +1,9 @@
 import React, { useRef } from "react";
 import "./Style.css";
 
-interface props {
-  todo: string;
-  setTodo: React.Dispatch<React.SetStateAction<string>>;
-  handleAdd: (e: React.FormEvent) => void;
-}
 
-const InputField: React.FC<props> = ({ todo, setTodo, handleAdd }) => {
+
+const InputField = ({ todo, setTodo, handleAdd }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (

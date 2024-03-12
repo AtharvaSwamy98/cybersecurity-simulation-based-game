@@ -1,0 +1,10 @@
+/* Header.css */
+
+.header-container {
+    background-color: #333; /* Background color for the header */
+    color: #fff;
+    font-size: 10px; /* Text color for the header */
+    height: 40px; /* Padding around the header content */
+    text-align: center; /* Center-align the header text */
+  }
+  
