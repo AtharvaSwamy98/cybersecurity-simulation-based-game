@@ -1,33 +1,63 @@
 import React, { useState } from 'react';
-import { Droppable } from 'react-beautiful-dnd'
+import { Droppable } from 'react-beautiful-dnd';
 import { Todo } from '../InputField/Modules';
 import SingleTodo from '../InputField/SingleTodo';
-import './RightSide.css'
+import './RightSide.css';
+
+const RightSide = ({ price, removeprice, toggleImagePopup, fetchApi, data, play}) => {
 
 
-
-  const RightSide = ({price,removeprice}) => {
-    const [isPlaying, setIsPlaying] = useState(false);
-
-    const handlePlayToggle = () => {
-      setIsPlaying(!isPlaying);
-    };
   return (
     <div className="right-container">
-     <div className="row-80">
-     <h1 className='price'>Remaining Budget: {removeprice}</h1>
-
+      <div className="row-40">
+        <h1 className="price">Remaining Budget: {removeprice}</h1>
+        <div class="image-container" 
+        // onClick={toggleImagePopup}
+        >
+          {/* <img
+            className="img"
+            src="https://images.pexels.com/photos/33109/fall-autumn-red-season.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+          /> */}
+           <div>
+            {!play ? (
+              <div>Loading...</div>
+            ) : (
+              <div>
+                {data && (
+                  <div>
+                    <h2>Fetched Data</h2>
+                    <ul>
+                    {/* {Object.keys(data).map(( i) => ( */}
+              
+                        
+                         <strong>Uptime:{data["uptime"]}</strong><br></br>
+                         <strong>Downtime:{data["downtime"]}</strong><br></br>
+                         <strong>Threat:{data["threat"]}</strong><br></br>
+                         <strong>Chosen Controls:{data["chosen_controls"]}</strong><br></br>
+                         <strong>Total Production:{data["total_production"]}</strong><br></br>
+                         <strong>Expected Total Production:{data["expected_total_production"]}</strong><br></br>
+                         <strong>Total Loss attacks:{data["total_loss_due_to_attacks"]}</strong><br></br>
+                         <strong>Budget left:{data["budget_left"]}</strong><br></br>
+                         <strong>Description:{data["description"]}</strong><br></br>
+                        
+                    {/* ))} */}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
-      <div className="row-20">
-      <h1 className='price'>Budget: {price}</h1>
-
-        <button className={isPlaying ? 'pause-button' : 'play-button'} onClick={handlePlayToggle}>
-          {isPlaying ? 'Pause' : 'Play'}
+      <div className="row-40">
+        <h1 className="price">Budget: {price}</h1>
+        <button className= 'play-button'onClick={fetchApi}>
+          Play
+    
         </button>
       </div>
     </div>
-    
-  )
-}
+  );
+};
 
-export default RightSide
+export default RightSide;

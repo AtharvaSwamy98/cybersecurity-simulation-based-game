@@ -23,7 +23,18 @@ const App= () => {
   const [budget, setBudget] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [todos, setTodos] = useState([]);
+  const [isImagePopupOpen, setIsImagePopupOpen] = useState(false);
+  const [upTime,setUptime] =useState();
+  const [downTime,setdownTime] = useState();
+  const [data,setData] =useState();
+  const [play,setPlay] = useState(false);
+  const [chooseControl,setchooseControl] = useState("");
 
+
+  // Toggle function to open/close the popup
+  const toggleImagePopup = () => {
+    setIsImagePopupOpen(!isImagePopupOpen);
+  };
 
   useEffect(() => {
     const fetchBudget = async () => {
@@ -41,6 +52,24 @@ const App= () => {
     fetchBudget();
   }, []);
 
+  const fetchData = async () => {
+    let stringValue = createStringWithCommas();
+    console.log(stringValue);
+    try {
+      const response = await fetch('https://cwesr6jpi4.execute-api.us-east-1.amazonaws.com/test/level?controls='+stringValue);
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+      const jsonData = await response.json();
+      setData(jsonData);
+      setPlay(true);
+
+
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
   const mergeWithPreloadedData = (fetchedData) => {
     return [
       ...TodoListPreLoaded,
@@ -53,9 +82,16 @@ const App= () => {
       })),
     ];
   };
+  const dragged =[];
+  const createStringWithCommas = () => {
+    // Map through chooseControl array and join elements with commas
+    return chooseControl.map((element, index) => {
+      // Add a comma after each element except the last one
+      return index === chooseControl.length - 1 ? element : element + ",";
+    }).join("");
+  };
   const onDragEnd = (result) => {
     const { destination, source } = result;
-  
     if (!destination) {
       return;
     }
@@ -77,7 +113,9 @@ const App= () => {
       add = active[source.index];
       active.splice(source.index, 1);
       const draggedTodo = todos[source.index];
-      
+      dragged.push(draggedTodo.todo);
+      console.log("dragged"+dragged);
+
 
       if (draggedTodo && draggedTodo.price !== undefined) {
         const lastPrice = price;
@@ -100,7 +138,7 @@ const App= () => {
       active.splice(destination.index, 0, add);
       const draggedTodo = todos[destination.index];
       const droppedTodo = active[destination.index];
-      console.log("Dropped Todo:", droppedTodo);
+      console.log("Dropped Source:", droppedTodo);
   
       if (draggedTodo && draggedTodo.price !== undefined) {
         const lastPrice = price;
@@ -123,40 +161,66 @@ const App= () => {
         setBudget(updatedBudget);
       }
     }
-  
+    
     setCompletedTodos(complete);
     setTodos(active);
+    setchooseControl(prevChooseControl => [...prevChooseControl, dragged]);
   };
+  
+  // const str =chooseControl.slice(1);
   
   return (
     <div>
-    {isLoading ? (
-      <div>Loading...</div>
-    ) : (
-    
-    <DragDropContext onDragEnd={onDragEnd}>
-    <div className="App">
-      <Header/>
-      <div className="container">
-        <LeftSide 
-          todos={todos} 
-          setTodos={setTodos} 
+      {isLoading ? (
+        <div>Loading...</div>
+      ) : (
+        <div>
+         {isImagePopupOpen && (
+            <div className="popup-background">
+              <div className="image-popup">
+                <img
+                  className="popup-image"
+                  src="https://images.pexels.com/photos/33109/fall-autumn-red-season.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                  alt="Popup Image"
+                />
+                <button onClick={toggleImagePopup}>Close</button>
+              </div>
+            </div>
+          )}
+            <DragDropContext onDragEnd={onDragEnd}>
+              <div className="App">
+                <Header />
+                <div className="container">
+                  <LeftSide 
+                  todos={todos} 
+                  setTodos={setTodos} 
+                  price={price} />
+                  <Center
+                    todos={todos}
+                    setTodos={setTodos}
+                    CompletedTodos={CompletedTodos}
+                    setCompletedTodos={setCompletedTodos}
+                  />
+                  <RightSide 
+                   price={budget}
+                   removeprice={removeprice} 
+                   toggleImagePopup={toggleImagePopup} 
+                   fetchApi ={fetchData} 
+                   data={data} 
+                   play={play}/>
+                </div>
+              </div>
+            </DragDropContext>
         
-          price={price}/>
-        <Center
-          todos={todos}
-          setTodos={setTodos}
-          CompletedTodos={CompletedTodos}
-          setCompletedTodos={setCompletedTodos}
-        />
+  
+          {/* Button to toggle the image popup */}
+       
+        </div>
 
-        <RightSide price={budget} removeprice={removeprice}/>
-      </div>
+      )}
     </div>
-    </DragDropContext>
-  )}
-  </div>
   );
+  
 };
 
 export default App;

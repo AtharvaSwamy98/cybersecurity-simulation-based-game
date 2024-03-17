@@ -2,13 +2,30 @@
     display: flex;
     flex-direction: column;
   }
-  
-  .row-80 {
-    flex: 8;
+  .image-container {
+    position: relative;
+    display: inline-block;
+  }
+  .text-overlay {
+    position: absolute;
+    top: 50%; /* Adjust as needed */
+    left: 50%; /* Adjust as needed */
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 255, 255, 0.7); /* Adjust background color and opacity */
+    padding: 10px; /* Adjust padding */
+    border-radius: 5px; /* Adjust border radius */
+    font-size: 18px; /* Adjust font size */
+    color: #000; /* Adjust text color */
+  }
+  .img{
+    width: 100%;
+  }
+  .row-40 {
+    flex: 4;
   }
   
-  .row-20 {
-    flex: 2;
+  .row-40 {
+    flex: 4;
   }
 
   /* RightSide.css */
