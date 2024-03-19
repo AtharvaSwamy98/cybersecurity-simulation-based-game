@@ -4,7 +4,7 @@ import { Todo } from '../InputField/Modules';
 import SingleTodo from '../InputField/SingleTodo';
 import './RightSide.css';
 
-const RightSide = ({ price, removeprice, toggleImagePopup, fetchApi, data, play}) => {
+const RightSide = ({ price, removeprice, toggleImagePopup, fetchApi, data, play, resetApi}) => {
 
 
   return (
@@ -53,6 +53,11 @@ const RightSide = ({ price, removeprice, toggleImagePopup, fetchApi, data, play}
         <h1 className="price">Budget: {price}</h1>
         <button className= 'play-button'onClick={fetchApi}>
           Play
+    
+        </button>
+
+        <button className= 'play-button'onClick={resetApi}>
+          Reset
     
         </button>
       </div>

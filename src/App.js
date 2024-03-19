@@ -20,7 +20,7 @@ const App= () => {
   const [price, setPrice] = useState(0);
   const [removeprice, setRemovePrice] = useState(0);
   const [CompletedTodos, setCompletedTodos] = useState([]);
-  const [budget, setBudget] = useState(null);
+  const [budget, setBudget] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [todos, setTodos] = useState([]);
   const [isImagePopupOpen, setIsImagePopupOpen] = useState(false);
@@ -50,17 +50,36 @@ const App= () => {
       }
     };
     fetchBudget();
-  }, []);
 
+   
+  }, []);
+  const resetApi = async () => {
+   
+    try {
+      const response = await fetch('https://cwesr6jpi4.execute-api.us-east-1.amazonaws.com/test/remove');
+    
+      const jsonData = await response.json();
+      if (!response.ok) {
+        alert(jsonData.error);
+      }
+      window.location.reload()
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
   const fetchData = async () => {
     let stringValue = createStringWithCommas();
     console.log(stringValue);
     try {
       const response = await fetch('https://cwesr6jpi4.execute-api.us-east-1.amazonaws.com/test/level?controls='+stringValue);
-      if (!response.ok) {
-        throw new Error('Failed to fetch data');
-      }
       const jsonData = await response.json();
+     
+      if (!response.ok) {
+       alert(jsonData.error);
+      }
+      
+      console.log(jsonData);
+      setBudget(jsonData.budget_left);
       setData(jsonData);
       setPlay(true);
 
@@ -107,9 +126,16 @@ const App= () => {
     let active = todos.slice(); // Create a copy to avoid modifying the state directly
     let complete = CompletedTodos.slice(); // Create a copy to avoid modifying the state directly
 
+
+  
+   
   
     // Source Logic
     if (source.droppableId === "TodosList") {
+      if(budget<=0){
+        alert("Cannot select the control as budget got over");
+         return ;
+       }
       add = active[source.index];
       active.splice(source.index, 1);
       const draggedTodo = todos[source.index];
@@ -118,13 +144,18 @@ const App= () => {
 
 
       if (draggedTodo && draggedTodo.price !== undefined) {
+        if(budget<=0){
+          alert("Cannot select the control as budget got over");
+           return ;
+         }
         const lastPrice = price;
-        const updatedPrice = price + draggedTodo.price;
-        const updatedBudget = budget - updatedPrice;
-        setBudget(updatedBudget);
-
-        setPrice(updatedPrice+ lastPrice)
-      
+          setBudget(draggedTodo.price);
+         console.log("Source dragged"+draggedTodo.price);
+        // const updatedPrice = price + draggedTodo.price;
+        // const updatedBudget = budget - updatedPrice;
+       
+        // setPrice(updatedPrice- lastPrice)
+        console.log(lastPrice);
 
       }
     } else {
@@ -132,7 +163,7 @@ const App= () => {
       complete.splice(source.index, 1);
       
     }
-  
+
     // Destination Logic
     if (destination.droppableId === "TodosList") {
       active.splice(destination.index, 0, add);
@@ -141,11 +172,15 @@ const App= () => {
       console.log("Dropped Source:", droppedTodo);
   
       if (draggedTodo && draggedTodo.price !== undefined) {
-        const lastPrice = price;
-        const updatedPrice = lastPrice+ price + draggedTodo.price;
-        setPrice(updatedPrice)
-        const updatedBudget = budget - updatedPrice;
-        setBudget(updatedBudget);
+          console.log("Dest Dragged"+draggedTodo.price);
+          const value = budget+draggedTodo.price;
+          setBudget(value)
+
+        // const lastPrice = price;
+        // const updatedPrice = lastPrice+ price + draggedTodo.price;
+        // setPrice(updatedPrice)
+        // const updatedBudget = budget - updatedPrice;
+        // setBudget(updatedBudget);
       }
     } 
     else {
@@ -165,6 +200,7 @@ const App= () => {
     setCompletedTodos(complete);
     setTodos(active);
     setchooseControl(prevChooseControl => [...prevChooseControl, dragged]);
+    
   };
   
   // const str =chooseControl.slice(1);
@@ -207,7 +243,8 @@ const App= () => {
                    toggleImagePopup={toggleImagePopup} 
                    fetchApi ={fetchData} 
                    data={data} 
-                   play={play}/>
+                   play={play}
+                   resetApi={resetApi}/>
                 </div>
               </div>
             </DragDropContext>
