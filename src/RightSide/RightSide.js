@@ -1,7 +1,5 @@
-import React, { useState } from 'react';
-import { Droppable } from 'react-beautiful-dnd';
-import { Todo } from '../InputField/Modules';
-import SingleTodo from '../InputField/SingleTodo';
+import React from 'react';
+
 import './RightSide.css';
 
 const RightSide = ({ price, removeprice, toggleImagePopup, fetchApi, data, play, resetApi}) => {
@@ -10,14 +8,8 @@ const RightSide = ({ price, removeprice, toggleImagePopup, fetchApi, data, play,
   return (
     <div className="right-container">
       <div className="row-40">
-        <h1 className="price">Remaining Budget: {removeprice}</h1>
-        <div class="image-container" 
-        // onClick={toggleImagePopup}
-        >
-          {/* <img
-            className="img"
-            src="https://images.pexels.com/photos/33109/fall-autumn-red-season.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-          /> */}
+     
+        <div class="image-container" >
            <div>
             {!play ? (
               <div>Loading...</div>
