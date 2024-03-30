@@ -30,24 +30,64 @@ const Container= () => {
   const toggleImagePopup = () => {
     setIsImagePopupOpen(!isImagePopupOpen);
   };
+  const [message, setMessage] = useState('');
+  const [ws, setWs] = useState(null);
 
   useEffect(() => {
-    const fetchBudget = async () => {
-      try {
-        const response = await fetch('https://cwesr6jpi4.execute-api.us-east-1.amazonaws.com/test/play'); // Replace with your API endpoint
-        const data = await response.json();
+    // Function to connect to WebSocket server
+    const connectWebSocket = () => {
+      const socket = new WebSocket('wss://of022jtfp6.execute-api.us-east-1.amazonaws.com/production/'); // Replace with your WebSocket server URL
+
+      // WebSocket event listeners
+      socket.onopen = () => {
+        console.log('WebSocket connected');
+        setWs(socket); // Save WebSocket instance to state
+      };
+
+      socket.onmessage = (event) => {
+        console.log('Received message:', event.data);
+        setMessage(event.data); 
         setBudget(data.budget);
         setIsLoading(false);
-        const mergedData = mergeWithPreloadedData(data);
-        setTodos(mergedData);
-      } catch (error) {
-        console.error('Error fetching budget:', error);
+        const mergedData = mergeWithPreloadedData(event.data);
+        setTodos(mergedData);// Set received message in state
+      };
+
+      socket.onclose = () => {
+        console.log('WebSocket disconnected');
+      };
+
+      // Save WebSocket instance to state
+      setWs(socket);
+    };
+
+    // Initial connection
+    connectWebSocket();
+
+    // Clean up function to close WebSocket connection
+    return () => {
+      if (ws) {
+        ws.close();
       }
     };
-    fetchBudget();
+  }, []); 
+  // useEffect(() => {
+  //   const fetchBudget = async () => {
+  //     try {
+  //       const response = await fetch('https://cwesr6jpi4.execute-api.us-east-1.amazonaws.com/test/play'); // Replace with your API endpoint
+  //       const data = await response.json();
+  //       setBudget(data.budget);
+  //       setIsLoading(false);
+  //       const mergedData = mergeWithPreloadedData(data);
+  //       setTodos(mergedData);
+  //     } catch (error) {
+  //       console.error('Error fetching budget:', error);
+  //     }
+  //   };
+  //   fetchBudget();
 
    
-  }, []);
+  // }, []);
   const resetApi = async () => {
    
     try {

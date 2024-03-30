@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import './App.css'; // Import CSS file
 import Login from './Component/Login';
 import Container from './Container/Container';
+import WebSocketComponent from './Temp/WebSocket';
 const App = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
-
+  
   const handleLogin = (username) => {
     setUsername(username);
     setLoggedIn(true);
@@ -18,14 +19,15 @@ const App = () => {
 
   return (
     <div className="app-container">
-      {loggedIn ? (
+      {/* {loggedIn ? ( */}
        
         <div>
        <Container/>
+       {/* <WebSocketComponent/> */}
        </div>
-      ) : (
-        <Login onLogin={handleLogin} />
-      )}
+      {/* // ) : (
+      //   <Login onLogin={handleLogin} />
+      // )} */}
     </div>
   );
 };
