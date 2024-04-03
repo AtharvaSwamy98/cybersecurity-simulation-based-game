@@ -4,9 +4,57 @@ import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import Header from "../Header/Header"
 import Center from "../Center/Center";
 import RightSide from "../RightSide/RightSide";
-import LeftSide from "../LeftSide/LeftSide"
+import LeftSide from "../LeftSide/LeftSide";
+import Dialog from "../Component/YesNoDialog";
 
-
+const jsonData = {
+  "budget": 5000, "controls": {
+    "c7": {
+      "control": "Regular security audits and risk assessments",
+       "cost": "$5000"
+      },
+      "c1": {
+        "control": "Secure Web Gateway", 
+        "cost": "$5000"
+      }, 
+      "c2": {
+        "control": "AntiMalware solution", 
+        "cost": "$2000"
+      }, 
+      "c3": {
+        "control": "Update Software solution",
+         "cost": "$2000"
+        }, 
+      "c4": {
+          "control": "Email Security  and safe internet Browsing and other security trainings",
+           "cost": "$1000"
+          },
+      "c5": {
+        "control": "Implement Encryption solutions for all the communication",
+        "cost": "$10000"
+      }, 
+      "c6": {
+        "control": "Network Intrusion Prevention", 
+        "cost": "$2000"
+      }, 
+      "c8": {
+          "control": "Vulnerability Scanning", 
+          "cost": "$1000"
+        },
+      "c9": {
+          "control": "Implement Strong Password Policies", 
+          "cost": "$500"
+        }, 
+      "c10": {
+          "control": "Conduct Privileged Account Audit", 
+          "cost": "$500"
+        }, 
+      "c11": {
+          "control": "Implement MFA",
+          "cost": "$500"
+        }
+      }
+};
 const TodoListPreLoaded =[
   
   
@@ -24,106 +72,86 @@ const Container= () => {
   const [data,setData] =useState();
   const [play,setPlay] = useState(false);
   const [chooseControl,setchooseControl] = useState("");
-
+  const[budgetRequest,setRequestBudget] = useState(false);
+  useEffect(() => {
+    fetchData();
+    console.log("function called")
+    const intervalId = setInterval(() => {
+      fetchData(); // Call fetchDataAndLog every 5 seconds
+  }, 4 * 60 * 1000);   
+  return () => clearInterval(intervalId);
+  }, []); 
 
   // Toggle function to open/close the popup
   const toggleImagePopup = () => {
     setIsImagePopupOpen(!isImagePopupOpen);
   };
-  const [message, setMessage] = useState('');
-  const [ws, setWs] = useState(null);
-
   useEffect(() => {
-    // Function to connect to WebSocket server
-    const connectWebSocket = () => {
-      const socket = new WebSocket('wss://of022jtfp6.execute-api.us-east-1.amazonaws.com/production/'); // Replace with your WebSocket server URL
+    const fetchBudget = async () => {
+      try {
+        const response = await fetch('https://cwesr6jpi4.execute-api.us-east-1.amazonaws.com/test/play'); // Replace with your API endpoint
+        // const data = await response.json();
 
-      // WebSocket event listeners
-      socket.onopen = () => {
-        console.log('WebSocket connected');
-        setWs(socket); // Save WebSocket instance to state
-      };
-
-      socket.onmessage = (event) => {
-        console.log('Received message:', event.data);
-        setMessage(event.data); 
-        setBudget(data.budget);
+        setBudget(jsonData.budget);
         setIsLoading(false);
-        const mergedData = mergeWithPreloadedData(event.data);
-        setTodos(mergedData);// Set received message in state
-      };
-
-      socket.onclose = () => {
-        console.log('WebSocket disconnected');
-      };
-
-      // Save WebSocket instance to state
-      setWs(socket);
-    };
-
-    // Initial connection
-    connectWebSocket();
-
-    // Clean up function to close WebSocket connection
-    return () => {
-      if (ws) {
-        ws.close();
+        const mergedData = mergeWithPreloadedData(jsonData);
+        
+        setTodos(mergedData);
+      } catch (error) {
+        console.error('Error fetching budget:', error);
       }
     };
-  }, []); 
-  // useEffect(() => {
-  //   const fetchBudget = async () => {
-  //     try {
-  //       const response = await fetch('https://cwesr6jpi4.execute-api.us-east-1.amazonaws.com/test/play'); // Replace with your API endpoint
-  //       const data = await response.json();
-  //       setBudget(data.budget);
-  //       setIsLoading(false);
-  //       const mergedData = mergeWithPreloadedData(data);
-  //       setTodos(mergedData);
-  //     } catch (error) {
-  //       console.error('Error fetching budget:', error);
-  //     }
-  //   };
-  //   fetchBudget();
+    fetchBudget();
 
    
-  // }, []);
-  const resetApi = async () => {
-   
-    try {
-      const response = await fetch('https://cwesr6jpi4.execute-api.us-east-1.amazonaws.com/test/remove');
-    
-      const jsonData = await response.json();
-      if (!response.ok) {
-        alert(jsonData.error);
-      }
-      window.location.reload()
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
+  }, []);
+
   const fetchData = async () => {
     let stringValue = createStringWithCommas();
     console.log(stringValue);
-    try {
-      const response = await fetch('https://cwesr6jpi4.execute-api.us-east-1.amazonaws.com/test/level?controls='+stringValue);
-      const jsonData = await response.json();
-     
-      if (!response.ok) {
-       alert(jsonData.error);
+    if(stringValue!=null){
+      try {
+        const response = await fetch('https://e5l5aptdy4.execute-api.us-east-1.amazonaws.com/test/select_controls?controls='+stringValue);
+        const jsonData = await response.json();
+        
+        if (!response.ok) {
+        // alert(jsonData.error);
+        console.log("JSON Error"+jsonData.error)
+        }
+        else{
+        setBudget(jsonData.budget_left);
+        setRequestBudget(jsonData.request_for_budget);
+        setData(jsonData);
+        setPlay(true);
+        }
+
+      } catch (error) {
+        console.error('Error fetching data:', error);
       }
-      
-      console.log(jsonData);
-      setBudget(jsonData.budget_left);
-      setData(jsonData);
-      setPlay(true);
-
-
-    } catch (error) {
-      console.error('Error fetching data:', error);
     }
   };
 
+  const fetchBudget = async () => {
+   
+      try {
+        const response = await fetch('https://e5l5aptdy4.execute-api.us-east-1.amazonaws.com/test/requestBudget');
+        const jsonData = await response.json();
+        
+        if (!response.ok) {
+        // alert(jsonData.error);
+        console.log("JSON Error"+jsonData.error)
+        }
+        else{
+        setBudget(jsonData.assigned_budget);
+        setData(jsonData);
+        setPlay(true);
+        }
+
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+  };
+ 
   const mergeWithPreloadedData = (fetchedData) => {
     return [
       ...TodoListPreLoaded,
@@ -138,6 +166,9 @@ const Container= () => {
   };
   const dragged =[];
   const createStringWithCommas = () => {
+    if (!chooseControl || chooseControl.length === 0) {
+      return ""; // Return an empty string if chooseControl is null, undefined, or empty
+  }
     // Map through chooseControl array and join elements with commas
     return chooseControl.map((element, index) => {
       // Add a comma after each element except the last one
@@ -237,9 +268,18 @@ const Container= () => {
     setchooseControl(prevChooseControl => [...prevChooseControl, dragged]);
     
   };
-  
   // const str =chooseControl.slice(1);
-  
+
+  const handleYes = () => {
+    // Handle 'Yes' action
+    fetchBudget();
+    setRequestBudget(false);
+  };
+
+  const handleNo = () => {
+    // Handle 'No' action
+    setRequestBudget(false);
+  };
   return (
     <div>
       {isLoading ? (
@@ -279,17 +319,25 @@ const Container= () => {
                    fetchApi ={fetchData} 
                    data={data} 
                    play={play}
-                   resetApi={resetApi}/>
+                  //  resetApi={resetApi}
+                   />
                 </div>
               </div>
             </DragDropContext>
         
-  
+          
           {/* Button to toggle the image popup */}
-       
+            {budgetRequest && (
+              <Dialog
+                message="Are you sure you want to proceed?"
+                onYes={handleYes}
+                onNo={handleNo}
+              />
+            )}
         </div>
 
       )}
+      {/* <button onClick={disconnectWebSocket}>Disconnect</button> */}
     </div>
   );
   

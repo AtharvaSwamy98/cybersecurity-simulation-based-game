@@ -45,22 +45,10 @@ const WebSocketComponent = () => {
     }
   };
 
-  useEffect(() => {
-    // Function to fetch data every 5 minutes
-    const fetchData = async () => {
-      console.log("print");
-      sendMessage();
-    };
-    // Run fetchData initially and then every 5 minutes
-    const fetchDataInterval = setInterval(fetchData, 5000); // 5 seconds in milliseconds
-
-    // Clean up function to clear interval
-    return () => clearInterval(fetchDataInterval);
-  }, []); 
   return (
     <div>
       <h1>WebSocket Example</h1>
-      {/* <button onClick={sendMessage}>Send Message</button> */}
+      <button onClick={sendMessage}>Send Message</button>
       <div>
         <h2>Connection Status:</h2>
         <p>{message}</p> {/* Render received message */}

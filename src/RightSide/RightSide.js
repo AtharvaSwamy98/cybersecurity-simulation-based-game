@@ -2,7 +2,9 @@ import React from 'react';
 
 import './RightSide.css';
 
-const RightSide = ({ price, removeprice, toggleImagePopup, fetchApi, data, play, resetApi}) => {
+const RightSide = ({ price, removeprice, toggleImagePopup, fetchApi, data, play, 
+  // resetApi
+}) => {
 
 
   return (
@@ -47,11 +49,11 @@ const RightSide = ({ price, removeprice, toggleImagePopup, fetchApi, data, play,
           Play
     
         </button>
-
+{/* 
         <button className= 'play-button'onClick={resetApi}>
           Reset
     
-        </button>
+        </button> */}
       </div>
     </div>
   );

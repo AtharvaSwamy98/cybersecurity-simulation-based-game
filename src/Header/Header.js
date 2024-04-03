@@ -5,7 +5,7 @@ import './Header.css'; // Import the CSS file for the header
   render() {
     return (
      <header className="header-container">
-        <h1>CyberGame</h1>
+        <span className='header-text'>CyberGame</span>
       </header>
     )
   }
