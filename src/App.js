@@ -6,6 +6,7 @@ import WebSocketComponent from './Temp/WebSocket';
 const App = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
+  const [webSocketJson, setWebSocketJson] = useState('');
   useEffect(() => {
     const PlayAPI = async () => {
       try {
@@ -40,8 +41,9 @@ const App = () => {
       {/* {loggedIn ? ( */}
        
         <div>
-       <Container/>
-       {/* <WebSocketComponent/> */}
+      
+       <WebSocketComponent/>
+        {/* <Container webSocketJsons={webSocketJson} /> */}
        </div>
       {/* // ) : (
       //   <Login onLogin={handleLogin} />

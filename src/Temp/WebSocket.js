@@ -1,58 +1,59 @@
 import React, { useState, useEffect } from 'react';
+import Container from '../Container/Container';
 
 const WebSocketComponent = () => {
-  const [message, setMessage] = useState('');
-  const [ws, setWs] = useState(null);
-
+  const [webSocket, setWebSocket] = useState(null);
+  const [data,setData]= useState(null);
+  const [jsonData,setJsonData]=useState(false);
   useEffect(() => {
-    // Function to connect to WebSocket server
-    const connectWebSocket = () => {
-      const socket = new WebSocket('wss://of022jtfp6.execute-api.us-east-1.amazonaws.com/production/'); // Replace with your WebSocket server URL
+    // Open WebSocket connection
+    const ws = new WebSocket('wss://of022jtfp6.execute-api.us-east-1.amazonaws.com/production/');
 
-      // WebSocket event listeners
-      socket.onopen = () => {
-        console.log('WebSocket connected');
-        setWs(socket); // Save WebSocket instance to state
-      };
-
-      socket.onmessage = (event) => {
-        console.log('Received message:', event.data);
-        setMessage(event.data); // Set received message in state
-      };
-
-      socket.onclose = () => {
-        console.log('WebSocket disconnected');
-      };
-
-      // Save WebSocket instance to state
-      setWs(socket);
+    // Add event listeners
+    ws.onopen = () => {
+      console.log('WebSocket connected');
     };
 
-    // Initial connection
-    connectWebSocket();
+    ws.onmessage = (event) => {
+      // console.log('Received message:', event.data);
+      // Handle incoming messages here
+      setData(event.data);
+      setJsonData(true);
+    };
 
-    // Clean up function to close WebSocket connection
+    ws.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
+    // Close WebSocket connection on component unmount
     return () => {
-      if (ws) {
-        ws.close();
-      }
+      ws.close();
     };
-  }, []); // Dependency array is empty to run this effect only once on component mount
 
-  const sendMessage = () => {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send('Hello, WebSocket!'); // Send message to WebSocket server
+    // Set WebSocket instance to state
+    setWebSocket(ws);
+    
+  },[]); // Run effect only once on component mount
+
+  // Function to send message through WebSocket
+  const sendMessage = (message) => {
+    if (webSocket) {
+      webSocket.send(message);
+    } else {
+      console.error('WebSocket connection not established.');
     }
   };
-
   return (
     <div>
-      <h1>WebSocket Example</h1>
-      <button onClick={sendMessage}>Send Message</button>
-      <div>
-        <h2>Connection Status:</h2>
-        <p>{message}</p> {/* Render received message */}
-      </div>
+      {/* <button onClick={() => sendMessage('Hello WebSocket!')}>Send Message</button> */}
+      {jsonData && (
+      <Container 
+      jsonDataValues={data}
+      />
+       )}
+       {!jsonData &&(
+        <h1> Game hasn't started by Admin</h1>
+       )}
     </div>
   );
 };

@@ -7,78 +7,34 @@ import RightSide from "../RightSide/RightSide";
 import LeftSide from "../LeftSide/LeftSide";
 import Dialog from "../Component/YesNoDialog";
 
-const jsonData = {
-  "budget": 5000, "controls": {
-    "c7": {
-      "control": "Regular security audits and risk assessments",
-       "cost": "$5000"
-      },
-      "c1": {
-        "control": "Secure Web Gateway", 
-        "cost": "$5000"
-      }, 
-      "c2": {
-        "control": "AntiMalware solution", 
-        "cost": "$2000"
-      }, 
-      "c3": {
-        "control": "Update Software solution",
-         "cost": "$2000"
-        }, 
-      "c4": {
-          "control": "Email Security  and safe internet Browsing and other security trainings",
-           "cost": "$1000"
-          },
-      "c5": {
-        "control": "Implement Encryption solutions for all the communication",
-        "cost": "$10000"
-      }, 
-      "c6": {
-        "control": "Network Intrusion Prevention", 
-        "cost": "$2000"
-      }, 
-      "c8": {
-          "control": "Vulnerability Scanning", 
-          "cost": "$1000"
-        },
-      "c9": {
-          "control": "Implement Strong Password Policies", 
-          "cost": "$500"
-        }, 
-      "c10": {
-          "control": "Conduct Privileged Account Audit", 
-          "cost": "$500"
-        }, 
-      "c11": {
-          "control": "Implement MFA",
-          "cost": "$500"
-        }
-      }
-};
+
 const TodoListPreLoaded =[
   
   
 ];
-const Container= () => {
+
+const Container= ({jsonDataValues}) => {
+
   const [price, setPrice] = useState(0);
+  const [showEmptyDataPopup, setShowEmptyDataPopup] = useState(false);
+  const [data,setData] =useState();
+
   const [removeprice, setRemovePrice] = useState(0);
   const [CompletedTodos, setCompletedTodos] = useState([]);
   const [budget, setBudget] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
   const [todos, setTodos] = useState([]);
   const [isImagePopupOpen, setIsImagePopupOpen] = useState(false);
-  const [upTime,setUptime] =useState();
-  const [downTime,setdownTime] = useState();
-  const [data,setData] =useState();
   const [play,setPlay] = useState(false);
+  const [right,setRight] = useState(null);
   const [chooseControl,setchooseControl] = useState("");
   const[budgetRequest,setRequestBudget] = useState(false);
   useEffect(() => {
     fetchData();
+    fetchUserStats();
     console.log("function called")
+    console.log(chooseControl);
     const intervalId = setInterval(() => {
-      fetchData(); // Call fetchDataAndLog every 5 seconds
-  }, 4 * 60 * 1000);   
+  }, 3 * 60 * 1000);   
   return () => clearInterval(intervalId);
   }, []); 
 
@@ -87,52 +43,23 @@ const Container= () => {
     setIsImagePopupOpen(!isImagePopupOpen);
   };
   useEffect(() => {
-    const fetchBudget = async () => {
-      try {
-        const response = await fetch('https://cwesr6jpi4.execute-api.us-east-1.amazonaws.com/test/play'); // Replace with your API endpoint
-        // const data = await response.json();
-
-        setBudget(jsonData.budget);
-        setIsLoading(false);
-        const mergedData = mergeWithPreloadedData(jsonData);
-        
-        setTodos(mergedData);
-      } catch (error) {
-        console.error('Error fetching budget:', error);
-      }
-    };
-    fetchBudget();
-
-   
+  
+      const jsonData = JSON.parse(jsonDataValues);
+      const fetchBudget = async () => {
+        try {
+          setBudget(jsonData.budget);
+          const mergedData = mergeWithPreloadedData(jsonData);
+          setTodos(mergedData);
+        } catch (error) {
+          console.error('Error fetching budget:', error);
+        }
+      };
+      fetchBudget();
+    
   }, []);
 
-  const fetchData = async () => {
-    let stringValue = createStringWithCommas();
-    console.log(stringValue);
-    if(stringValue!=null){
-      try {
-        const response = await fetch('https://e5l5aptdy4.execute-api.us-east-1.amazonaws.com/test/select_controls?controls='+stringValue);
-        const jsonData = await response.json();
-        
-        if (!response.ok) {
-        // alert(jsonData.error);
-        console.log("JSON Error"+jsonData.error)
-        }
-        else{
-        setBudget(jsonData.budget_left);
-        setRequestBudget(jsonData.request_for_budget);
-        setData(jsonData);
-        setPlay(true);
-        }
-
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    }
-  };
 
   const fetchBudget = async () => {
-   
       try {
         const response = await fetch('https://e5l5aptdy4.execute-api.us-east-1.amazonaws.com/test/requestBudget');
         const jsonData = await response.json();
@@ -143,7 +70,7 @@ const Container= () => {
         }
         else{
         setBudget(jsonData.assigned_budget);
-        setData(jsonData);
+        // setData(jsonData);
         setPlay(true);
         }
 
@@ -151,6 +78,24 @@ const Container= () => {
         console.error('Error fetching data:', error);
       }
   };
+  const fetchUserStats = async () => {
+    try {
+      const response = await fetch('https://e5l5aptdy4.execute-api.us-east-1.amazonaws.com/test/getUserStats');
+      const jsonDataStats = await response.json();
+      if (!response.ok) {
+      // alert(jsonData.error);
+      console.log("JSON Error"+jsonDataStats.error)
+      }
+      else{
+      setRight(jsonDataStats);
+      // setBudget(jsonData.budget_left);
+      setPlay(true);
+      }
+
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+};
  
   const mergeWithPreloadedData = (fetchedData) => {
     return [
@@ -163,6 +108,31 @@ const Container= () => {
         isDone: false,
       })),
     ];
+  };
+  const fetchData = async () => {
+    let stringValue = createStringWithCommas();
+    console.log(stringValue);
+    fetchUserStats();
+    if(stringValue!=null){
+      try {
+        const response = await fetch('https://e5l5aptdy4.execute-api.us-east-1.amazonaws.com/test/select_controls?controls='+stringValue);
+        const jsonData = await response.json();
+        
+        if (!response.ok) {
+        // alert(jsonData.error);
+        console.log("JSON Error"+jsonData.error)
+        }
+        else{
+         setBudget(jsonData.budget_left);
+        setRequestBudget(jsonData.request_for_budget);
+        setData(jsonData);
+        setPlay(true);
+        }
+
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    }
   };
   const dragged =[];
   const createStringWithCommas = () => {
@@ -282,9 +252,7 @@ const Container= () => {
   };
   return (
     <div>
-      {isLoading ? (
-        <div>Loading...</div>
-      ) : (
+     
         <div>
          {isImagePopupOpen && (
             <div className="popup-background">
@@ -317,7 +285,8 @@ const Container= () => {
                    removeprice={removeprice} 
                    toggleImagePopup={toggleImagePopup} 
                    fetchApi ={fetchData} 
-                   data={data} 
+                   fetchStats={fetchUserStats}
+                   right={right} 
                    play={play}
                   //  resetApi={resetApi}
                    />
@@ -335,8 +304,7 @@ const Container= () => {
               />
             )}
         </div>
-
-      )}
+       
       {/* <button onClick={disconnectWebSocket}>Disconnect</button> */}
     </div>
   );

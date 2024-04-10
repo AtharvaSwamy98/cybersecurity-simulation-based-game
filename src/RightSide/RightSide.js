@@ -2,7 +2,7 @@ import React from 'react';
 
 import './RightSide.css';
 
-const RightSide = ({ price, removeprice, toggleImagePopup, fetchApi, data, play, 
+const RightSide = ({ price, removeprice, toggleImagePopup, fetchApi,fetchStats, right, play, 
   // resetApi
 }) => {
 
@@ -17,22 +17,24 @@ const RightSide = ({ price, removeprice, toggleImagePopup, fetchApi, data, play,
               <div>Loading...</div>
             ) : (
               <div>
-                {data && (
+                {right && (
                   <div>
                     <h2>Fetched Data</h2>
                     <ul>
                     {/* {Object.keys(data).map(( i) => ( */}
               
                         
-                         <strong>Uptime:{data["uptime"]}</strong><br></br>
-                         <strong>Downtime:{data["downtime"]}</strong><br></br>
-                         <strong>Threat:{data["threat"]}</strong><br></br>
-                         <strong>Chosen Controls:{data["chosen_controls"]}</strong><br></br>
-                         <strong>Total Production:{data["total_production"]}</strong><br></br>
-                         <strong>Expected Total Production:{data["expected_total_production"]}</strong><br></br>
-                         <strong>Total Loss attacks:{data["total_loss_due_to_attacks"]}</strong><br></br>
-                         <strong>Budget left:{data["budget_left"]}</strong><br></br>
-                         <strong>Description:{data["description"]}</strong><br></br>
+                         <strong>Uptime:{right["uptime"]}</strong><br></br>
+                         <strong>Downtime:{right["downtime"]}</strong><br></br>
+                         <strong>Threat:{right["threat"]}</strong><br></br>
+                         <strong>Chosen Controls:</strong><br />
+                                {right.controls.map((item, index) => (
+                                  <span key={index}>{item.control}<br /></span>
+                                ))}                         <strong>Total Production:{right["expected_production_amount"]}</strong><br></br>
+                         <strong>Expected Total Production:{right["accumulated_production_amount"]}</strong><br></br>
+                         <strong>Total Loss attacks:{right["total_loss_due_to_attacks"]}</strong><br></br>
+                         <strong>Budget left:{right["budget_left"]}</strong><br></br>
+                         <strong>Description:{right["description"]}</strong><br></br>
                         
                     {/* ))} */}
                     </ul>
