@@ -17,8 +17,16 @@ const WebSocketComponent = () => {
     ws.onmessage = (event) => {
       // console.log('Received message:', event.data);
       // Handle incoming messages here
-      setData(event.data);
-      setJsonData(true);
+      if(event.data.attack!=null){
+        console.log(event.data);
+        alert(event.data.attack);
+      }
+      else{
+        console.log(event.data);
+
+        setData(event.data);
+        setJsonData(true);
+      }
     };
 
     ws.onclose = () => {

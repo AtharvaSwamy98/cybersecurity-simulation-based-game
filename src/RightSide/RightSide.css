@@ -56,4 +56,43 @@
     cursor: pointer;
   }
   
+
+  
+  .row-40 {
+    flex: 1;
+  }
+  
+  .image-container {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .scrollable-box {
+    max-height: 300px; /* Adjust the height as needed */
+    overflow: auto;
+  }
+  
+  .price {
+    margin-top: 20px;
+    text-align: center;
+  }
+  
+  .play-button {
+    display: block;
+    margin: 0 auto;
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+  }
+  
+  .play-button:hover {
+    background-color: #0056b3;
+  }
+  
   

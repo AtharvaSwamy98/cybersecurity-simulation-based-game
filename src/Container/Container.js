@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "./Container.css";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import Header from "../Header/Header"
@@ -28,14 +28,20 @@ const Container= ({jsonDataValues}) => {
   const [right,setRight] = useState(null);
   const [chooseControl,setchooseControl] = useState("");
   const[budgetRequest,setRequestBudget] = useState(false);
+  const isFirstRun = useRef(true);
+
   useEffect(() => {
-    fetchData();
-    fetchUserStats();
-    console.log("function called")
-    console.log(chooseControl);
-    const intervalId = setInterval(() => {
-  }, 3 * 60 * 1000);   
-  return () => clearInterval(intervalId);
+    if (!isFirstRun.current) {
+      fetchData();
+      fetchUserStats();
+      const intervalId = setInterval(() => {
+    }, 30 * 1000);   
+    return () => clearInterval(intervalId);
+  }
+  else {
+    // Update isFirstRun to false
+    isFirstRun.current = false;
+  }
   }, []); 
 
   // Toggle function to open/close the popup
@@ -80,15 +86,19 @@ const Container= ({jsonDataValues}) => {
   };
   const fetchUserStats = async () => {
     try {
+      console.log("UserStats Called")
+
       const response = await fetch('https://e5l5aptdy4.execute-api.us-east-1.amazonaws.com/test/getUserStats');
       const jsonDataStats = await response.json();
       if (!response.ok) {
-      // alert(jsonData.error);
+      alert(jsonDataStats.error);
       console.log("JSON Error"+jsonDataStats.error)
       }
       else{
+        console.log("JSON Error"+JSON.stringify(jsonDataStats))
+
       setRight(jsonDataStats);
-      // setBudget(jsonData.budget_left);
+      setBudget(jsonDataStats.budget_left);
       setPlay(true);
       }
 
