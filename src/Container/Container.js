@@ -31,9 +31,11 @@ const Container= ({jsonDataValues}) => {
   const isFirstRun = useRef(true);
 
   useEffect(() => {
+    
     if (!isFirstRun.current) {
       fetchData();
-      fetchUserStats();
+      // fetchUserStats();
+  
       const intervalId = setInterval(() => {
     }, 30 * 1000);   
     return () => clearInterval(intervalId);
@@ -41,6 +43,7 @@ const Container= ({jsonDataValues}) => {
   else {
     // Update isFirstRun to false
     isFirstRun.current = false;
+    // fetchData();
   }
   }, []); 
 
@@ -53,7 +56,7 @@ const Container= ({jsonDataValues}) => {
       const jsonData = JSON.parse(jsonDataValues);
       const fetchBudget = async () => {
         try {
-          setBudget(jsonData.budget);
+          setBudget(15000);
           const mergedData = mergeWithPreloadedData(jsonData);
           setTodos(mergedData);
         } catch (error) {
@@ -67,7 +70,7 @@ const Container= ({jsonDataValues}) => {
 
   const fetchBudget = async () => {
       try {
-        const response = await fetch('https://e5l5aptdy4.execute-api.us-east-1.amazonaws.com/test/requestBudget');
+        const response = await fetch('https://e5l5aptdy4.execute-api.us-east-1.amazonaws.com/test/request_budget');
         const jsonData = await response.json();
         
         if (!response.ok) {
@@ -75,9 +78,13 @@ const Container= ({jsonDataValues}) => {
         console.log("JSON Error"+jsonData.error)
         }
         else{
-        setBudget(jsonData.assigned_budget);
-        // setData(jsonData);
-        setPlay(true);
+          if(jsonData.assigned_budget==0 || jsonData.assigned_budget==null){
+            alert("Game Over");
+          }
+          else{
+            console.log("JSON Budget"+jsonData.assigned_budget);
+            setBudget(jsonData.assigned_budget);
+          }
         }
 
       } catch (error) {
@@ -95,10 +102,10 @@ const Container= ({jsonDataValues}) => {
       console.log("JSON Error"+jsonDataStats.error)
       }
       else{
-        console.log("JSON Error"+JSON.stringify(jsonDataStats))
-
+      console.log("JSON Response"+JSON.stringify(jsonDataStats))
       setRight(jsonDataStats);
-      setBudget(jsonDataStats.budget_left);
+      setRequestBudget(jsonDataStats.apply_for_budget);
+      setBudget(jsonDataStats.budget_left==null && budgetRequest==false?jsonDataStats.initial_budget:jsonDataStats.budget_left);
       setPlay(true);
       }
 
@@ -121,8 +128,9 @@ const Container= ({jsonDataValues}) => {
   };
   const fetchData = async () => {
     let stringValue = createStringWithCommas();
-    console.log(stringValue);
-    fetchUserStats();
+    console.log("Controllers"+stringValue);
+    
+    
     if(stringValue!=null){
       try {
         const response = await fetch('https://e5l5aptdy4.execute-api.us-east-1.amazonaws.com/test/select_controls?controls='+stringValue);
@@ -134,10 +142,11 @@ const Container= ({jsonDataValues}) => {
         }
         else{
          setBudget(jsonData.budget_left);
-        setRequestBudget(jsonData.request_for_budget);
+        fetchUserStats();
         setData(jsonData);
         setPlay(true);
         }
+       
 
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -147,11 +156,9 @@ const Container= ({jsonDataValues}) => {
   const dragged =[];
   const createStringWithCommas = () => {
     if (!chooseControl || chooseControl.length === 0) {
-      return ""; // Return an empty string if chooseControl is null, undefined, or empty
-  }
-    // Map through chooseControl array and join elements with commas
+      return ""; 
+    }
     return chooseControl.map((element, index) => {
-      // Add a comma after each element except the last one
       return index === chooseControl.length - 1 ? element : element + ",";
     }).join("");
   };
@@ -252,12 +259,15 @@ const Container= ({jsonDataValues}) => {
 
   const handleYes = () => {
     // Handle 'Yes' action
+    console.log("Yes")
     fetchBudget();
     setRequestBudget(false);
   };
 
   const handleNo = () => {
     // Handle 'No' action
+    console.log("No")
+
     setRequestBudget(false);
   };
   return (

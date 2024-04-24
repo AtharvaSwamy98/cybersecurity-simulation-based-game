@@ -1,7 +1,7 @@
 import React from 'react';
 import './RightSide.css';
 
-const RightSide = ({ price, removeprice, toggleImagePopup, fetchApi, fetchStats, right, play }) => {
+const RightSide = ({ price, removeprice, toggleImagePopup, fetchApi, right, play }) => {
   return (
     <div className="right-container">
       <div className="row-40">
@@ -21,7 +21,16 @@ const RightSide = ({ price, removeprice, toggleImagePopup, fetchApi, fetchStats,
                         <strong>Player Start Time:</strong> {right.player_start_time}<br></br>
                         <strong>Uptime:</strong> {right.uptime}<br></br>
                         <strong>Downtime:</strong> {right.downtime}<br></br>
-                     
+                        <strong>Controller:</strong>
+                        <ul>
+                          {right.controls.map((control, index) => (
+                            <li key={index} style={{ listStyleType: 'none' }}>
+                              <strong>Name:</strong> {control.control},{' '}<br></br>
+                              <strong>TimeStamp:</strong> {control.timestamp}<br></br>
+                            </li>
+                          ))}
+                        </ul>
+                      
                           <strong>Threats:</strong>
                           <ul>
                             {right.threats.map((threat, index) => (
@@ -73,7 +82,7 @@ const RightSide = ({ price, removeprice, toggleImagePopup, fetchApi, fetchStats,
       </div>
       <div className="row-40">
         <h1 className="price">Budget: {price}</h1>
-        <button className='play-button' onClick={fetchStats}>
+        <button className='play-button' onClick={fetchApi}>
           Play
         </button>
       </div>
