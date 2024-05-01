@@ -11,7 +11,7 @@ const Center = ({ todos, setTodos, CompletedTodos, setCompletedTodos }) => {
         backgroundImage: 'url("https://images.pexels.com/photos/7676308/pexels-photo-7676308.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2")center center / cover no-repeat'
         }}>
       </div>
-      <Droppable droppableId="TodosRemove">
+      <Droppable droppableId="CompletedTodos">
         {(provided, snapshot) => (
           <div
             ref={provided.innerRef}

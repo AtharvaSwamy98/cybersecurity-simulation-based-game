@@ -32,20 +32,13 @@ const Container= ({jsonDataValues}) => {
 
   useEffect(() => {
     
-    if (!isFirstRun.current) {
-      fetchData();
-      // fetchUserStats();
-  
+   
       const intervalId = setInterval(() => {
+        fetchData();
     }, 30 * 1000);   
     return () => clearInterval(intervalId);
-  }
-  else {
-    // Update isFirstRun to false
-    isFirstRun.current = false;
-    // fetchData();
-  }
-  }, []); 
+  },
+   []); 
 
   // Toggle function to open/close the popup
   const toggleImagePopup = () => {
@@ -107,6 +100,7 @@ const Container= ({jsonDataValues}) => {
       setRequestBudget(jsonDataStats.apply_for_budget);
       setBudget(jsonDataStats.budget_left==null && budgetRequest==false?jsonDataStats.initial_budget:jsonDataStats.budget_left);
       setPlay(true);
+     
       }
 
     } catch (error) {
@@ -145,6 +139,7 @@ const Container= ({jsonDataValues}) => {
         fetchUserStats();
         setData(jsonData);
         setPlay(true);
+        setchooseControl('');
         }
        
 
@@ -158,9 +153,7 @@ const Container= ({jsonDataValues}) => {
     if (!chooseControl || chooseControl.length === 0) {
       return ""; 
     }
-    return chooseControl.map((element, index) => {
-      return index === chooseControl.length - 1 ? element : element + ",";
-    }).join("");
+    return chooseControl;
   };
   const onDragEnd = (result) => {
     const { destination, source } = result;
