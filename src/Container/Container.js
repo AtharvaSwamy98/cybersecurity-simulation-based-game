@@ -29,17 +29,7 @@ const Container= ({jsonDataValues}) => {
   const [chooseControl,setchooseControl] = useState("");
   const[budgetRequest,setRequestBudget] = useState(false);
   const isFirstRun = useRef(true);
-
-  useEffect(() => {
-    
-   
-      const intervalId = setInterval(() => {
-        fetchData();
-    }, 30 * 1000);   
-    return () => clearInterval(intervalId);
-  },
-   []); 
-
+  
   // Toggle function to open/close the popup
   const toggleImagePopup = () => {
     setIsImagePopupOpen(!isImagePopupOpen);
@@ -49,7 +39,7 @@ const Container= ({jsonDataValues}) => {
       const jsonData = JSON.parse(jsonDataValues);
       const fetchBudget = async () => {
         try {
-          setBudget(15000);
+          setBudget(jsonData.budget);
           const mergedData = mergeWithPreloadedData(jsonData);
           setTodos(mergedData);
         } catch (error) {
@@ -59,6 +49,45 @@ const Container= ({jsonDataValues}) => {
       fetchBudget();
     
   }, []);
+
+  const MINUTE_MS = 30000;
+
+
+
+useEffect(() => {
+  const fetchDataPeriodically = async () => {
+    let stringValue = createStringWithCommas();
+    console.log("Controllers" + stringValue);
+
+    if (stringValue != null) {
+      try {
+        const response = await fetch('https://e5l5aptdy4.execute-api.us-east-1.amazonaws.com/test/select_controls?controls=' + stringValue);
+        const jsonData = await response.json();
+
+        if (!response.ok) {
+          // alert(jsonData.error);
+          console.log("JSON Error" + jsonData.error)
+        } else {
+          setBudget(jsonData.budget_left);
+          fetchUserStats();
+          setData(jsonData);
+          setPlay(true);
+          setchooseControl(''); // Clear chooseControl after fetching data
+        }
+
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+      setchooseControl(''); // Clear chooseControl after fetching data
+
+    }
+    fetchUserStats();
+  };
+
+  const intervalId = setInterval(fetchDataPeriodically, 10 * 1000);
+  return () => clearInterval(intervalId);
+}, [chooseControl]); // Include chooseControl as a dependency
+
 
 
   const fetchBudget = async () => {
@@ -71,7 +100,7 @@ const Container= ({jsonDataValues}) => {
         console.log("JSON Error"+jsonData.error)
         }
         else{
-          if(jsonData.assigned_budget==0 || jsonData.assigned_budget==null){
+          if(jsonData.assigned_budget===0 || jsonData.assigned_budget===null){
             alert("Game Over");
           }
           else{
@@ -98,7 +127,7 @@ const Container= ({jsonDataValues}) => {
       console.log("JSON Response"+JSON.stringify(jsonDataStats))
       setRight(jsonDataStats);
       setRequestBudget(jsonDataStats.apply_for_budget);
-      setBudget(jsonDataStats.budget_left==null && budgetRequest==false?jsonDataStats.initial_budget:jsonDataStats.budget_left);
+      setBudget(jsonDataStats.budget_left===null && budgetRequest===false?jsonDataStats.initial_budget:jsonDataStats.budget_left);
       setPlay(true);
      
       }
@@ -121,6 +150,7 @@ const Container= ({jsonDataValues}) => {
     ];
   };
   const fetchData = async () => {
+    
     let stringValue = createStringWithCommas();
     console.log("Controllers"+stringValue);
     

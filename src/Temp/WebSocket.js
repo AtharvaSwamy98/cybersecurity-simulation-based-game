@@ -18,8 +18,11 @@ const WebSocketComponent = () => {
       // console.log('Received message:', event.data);
       // Handle incoming messages here  
       
-        console.log(event.data);
-
+        console.log("WebsocketData+"+event.data);
+        if (event.data.includes("attack")) {
+          // If the received data matches, show an alert
+          alert(event.data);
+        }
         setData(event.data);
         setJsonData(true);
       
