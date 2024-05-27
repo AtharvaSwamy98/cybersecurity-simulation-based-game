@@ -51,22 +51,45 @@ const Login = () => {
   const handleClick = () => {
     setEmailErr("");
     setPasswordErr("");
+    
     validation()
       .then((res) => {
         if (res.email === '' && res.password === '') {
-          authenticate(email,password)
-          .then((data)=>{
-            setLoginErr('');
-            Navigate('/dashboard');
-          },(err)=>{
-            console.log(err);
-            setLoginErr(err.message)
-          })
-          .catch(err=>console.log(err))
+          const authenticationData = {
+            Username: email,
+            Password: password,
+          };
+  
+          const authenticationDetails = new AuthenticationDetails(authenticationData);
+  
+          const userData = {
+            Username: email,
+            Pool: userPool,
+          };
+  
+          const cognitoUser = new CognitoUser(userData);
+  
+          cognitoUser.authenticateUser(authenticationDetails, {
+            onSuccess: (session) => {
+              console.log('Authentication successful', session);
+              // Redirect to dashboard or any other protected route
+              Navigate('/dashboard');
+            },
+            onFailure: (err) => {
+              console.error('Authentication failed', err);
+              setLoginErr(err.message); // Update state to show error message
+            },
+            newPasswordRequired: (userAttributes, requiredAttributes) => {
+              // This callback will be invoked if the user is required to set a new password
+              console.log('New password required', userAttributes, requiredAttributes);
+              // Handle new password requirement, if applicable
+            },
+          });
         }
-      }, err => console.log(err))
-      .catch(err => console.log(err));
-  }
+      })
+      .catch((err) => console.error(err));
+  };
+  
 
   return (
     <div className="login">
