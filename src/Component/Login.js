@@ -1,47 +1,102 @@
-import React, { useState } from 'react';
-import './Login.css'; // Import CSS file
+import React, { useState } from 'react'
+import { Button, TextField,Typography } from '@mui/material'
+import { useNavigate } from 'react-router-dom';
+import { authenticate } from '../services/authenticate';
+import userpool from '../UserPool'
 
-const Login = ({ onLogin }) => {
-  const [username, setUsername] = useState('');
+const Login = () => {
+
+  const Navigate = useNavigate();
+
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [emailErr, setEmailErr] = useState('');
+  const [passwordErr, setPasswordErr] = useState('');
+  const [loginErr,setLoginErr]=useState('');
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    // Fake authentication logic (replace with your actual authentication logic)
-    if (username === 'user' && password === 'password') {
-      onLogin(username);
-    } else {
-      setError('Invalid username or password');
+  const formInputChange = (formField, value) => {
+    if (formField === "email") {
+      setEmail(value);
+    }
+    if (formField === "password") {
+      setPassword(value);
     }
   };
 
-  return (
-    <div className="login-container">
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="input-container">
-          <label>Username:</label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </div>
-        <div className="input-container">
-          <label>Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        <button type="submit">Login</button>
-        {error && <div className="error-message">{error}</div>}
-      </form>
-    </div>
-  );
-};
+  const validation = () => {
+    return new Promise((resolve, reject) => {
+      if (email === '' && password === '') {
+        setEmailErr("Email is Required");
+        setPasswordErr("Password is required")
+        resolve({ email: "Email is Required", password: "Password is required" });
+      }
+      else if (email === '') {
+        setEmailErr("Email is Required")
+        resolve({ email: "Email is Required", password: "" });
+      }
+      else if (password === '') {
+        setPasswordErr("Password is required")
+        resolve({ email: "", password: "Password is required" });
+      }
+      else if (password.length < 6) {
+        setPasswordErr("must be 6 character")
+        resolve({ email: "", password: "must be 6 character" });
+      }
+      else {
+        resolve({ email: "", password: "" });
+      }
+    });
+  };
 
-export default Login;
+  const handleClick = () => {
+    setEmailErr("");
+    setPasswordErr("");
+    validation()
+      .then((res) => {
+        if (res.email === '' && res.password === '') {
+          authenticate(email,password)
+          .then((data)=>{
+            setLoginErr('');
+            Navigate('/dashboard');
+          },(err)=>{
+            console.log(err);
+            setLoginErr(err.message)
+          })
+          .catch(err=>console.log(err))
+        }
+      }, err => console.log(err))
+      .catch(err => console.log(err));
+  }
+
+  return (
+    <div className="login">
+
+      <div className='form'>
+        <div className="formfield">
+          <TextField
+            value={email}
+            onChange={(e) => formInputChange("email", e.target.value)}
+            label="Email"
+            helperText={emailErr}
+          />
+        </div>
+        <div className='formfield'>
+          <TextField
+            value={password}
+            onChange={(e) => { formInputChange("password", e.target.value) }}
+            type="password"
+            label="Password"
+            helperText={passwordErr}
+          />
+        </div>
+        <div className='formfield'>
+          <Button type='submit' variant='contained' onClick={handleClick}>Login</Button>
+        </div>
+        <Typography variant="body">{loginErr}</Typography>
+      </div>
+
+    </div>
+  )
+}
+
+export default Login
