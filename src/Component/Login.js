@@ -1,125 +1,55 @@
-import React, { useState } from 'react'
-import { Button, TextField,Typography } from '@mui/material'
-import { useNavigate } from 'react-router-dom';
-import { authenticate } from '../services/authenticate';
-import userpool from '../UserPool'
+import React, { useState } from 'react';
+import './Login.css'; // Import CSS file
 
-const Login = () => {
-
-  const Navigate = useNavigate();
-
-  const [email, setEmail] = useState('');
+const Login = ({ onLogin }) => {
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [emailErr, setEmailErr] = useState('');
-  const [passwordErr, setPasswordErr] = useState('');
-  const [loginErr,setLoginErr]=useState('');
+  const [error, setError] = useState('');
 
-  const formInputChange = (formField, value) => {
-    if (formField === "email") {
-      setEmail(value);
-    }
-    if (formField === "password") {
-      setPassword(value);
-    }
-  };
-
-  const validation = () => {
-    return new Promise((resolve, reject) => {
-      if (email === '' && password === '') {
-        setEmailErr("Email is Required");
-        setPasswordErr("Password is required")
-        resolve({ email: "Email is Required", password: "Password is required" });
-      }
-      else if (email === '') {
-        setEmailErr("Email is Required")
-        resolve({ email: "Email is Required", password: "" });
-      }
-      else if (password === '') {
-        setPasswordErr("Password is required")
-        resolve({ email: "", password: "Password is required" });
-      }
-      else if (password.length < 6) {
-        setPasswordErr("must be 6 character")
-        resolve({ email: "", password: "must be 6 character" });
-      }
-      else {
-        resolve({ email: "", password: "" });
-      }
-    });
-  };
-
-  const handleClick = () => {
-    setEmailErr("");
-    setPasswordErr("");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     
-    validation()
-      .then((res) => {
-        if (res.email === '' && res.password === '') {
-          const authenticationData = {
-            Username: email,
-            Password: password,
-          };
-  
-          const authenticationDetails = new AuthenticationDetails(authenticationData);
-  
-          const userData = {
-            Username: email,
-            Pool: userPool,
-          };
-  
-          const cognitoUser = new CognitoUser(userData);
-  
-          cognitoUser.authenticateUser(authenticationDetails, {
-            onSuccess: (session) => {
-              console.log('Authentication successful', session);
-              // Redirect to dashboard or any other protected route
-              Navigate('/dashboard');
-            },
-            onFailure: (err) => {
-              console.error('Authentication failed', err);
-              setLoginErr(err.message); // Update state to show error message
-            },
-            newPasswordRequired: (userAttributes, requiredAttributes) => {
-              // This callback will be invoked if the user is required to set a new password
-              console.log('New password required', userAttributes, requiredAttributes);
-              // Handle new password requirement, if applicable
-            },
-          });
-        }
-      })
-      .catch((err) => console.error(err));
+    try {
+      // Example: Perform login validation here, and if successful, proceed with OAuth
+      // For now, we'll assume the credentials are valid for demonstration purposes
+      // This is where you could add an API call to validate credentials
+      if (username && password) {
+        // Simulate login success and trigger OAuth flow
+        onLogin(username);
+      } else {
+        setError('Invalid username or password');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setError('An error occurred during login');
+    }
   };
-  
 
   return (
-    <div className="login">
-
-      <div className='form'>
-        <div className="formfield">
-          <TextField
-            value={email}
-            onChange={(e) => formInputChange("email", e.target.value)}
-            label="Email"
-            helperText={emailErr}
+    <div className="login-container">
+      <h2>Login</h2>
+      <form onSubmit={handleSubmit}>
+        <div className="input-container">
+          <label>Username:</label>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
           />
         </div>
-        <div className='formfield'>
-          <TextField
-            value={password}
-            onChange={(e) => { formInputChange("password", e.target.value) }}
+        <div className="input-container">
+          <label>Password:</label>
+          <input
             type="password"
-            label="Password"
-            helperText={passwordErr}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
         </div>
-        <div className='formfield'>
-          <Button type='submit' variant='contained' onClick={handleClick}>Login</Button>
-        </div>
-        <Typography variant="body">{loginErr}</Typography>
-      </div>
-
+        <button type="submit">Login</button>
+        {error && <div className="error-message">{error}</div>}
+      </form>
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

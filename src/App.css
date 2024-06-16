@@ -1,7 +1,15 @@
-/* App.css */
+.home-container {
+  text-align: center;
+  padding: 50px;
+}
 
-.app-container {
-    text-align: center;
-    /* background-color: #000000; Set background color */
-  }
-  
+.home-container h1 {
+  font-size: 2em;
+  margin-bottom: 20px;
+}
+
+.home-container button {
+  padding: 10px 20px;
+  font-size: 1em;
+  cursor: pointer;
+}

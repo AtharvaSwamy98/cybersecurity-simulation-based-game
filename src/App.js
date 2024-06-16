@@ -1,91 +1,111 @@
-// import React, { useState, useEffect } from 'react';
-// import './App.css'; // Import CSS file
-// const App = () => {
-//   const [loggedIn, setLoggedIn] = useState(false);
-//   const [username, setUsername] = useState('');
-//   useEffect(() => {
-   
-
-//     // Call fetchData immediately when the component mounts
-//     PlayAPI();
-    
-//     // No need to include fetchData in the dependency array
-//   }, []); 
-
-//   const PlayAPI = async () => {
-//     try {
-//       // Call your API here
-//       const response = await fetch('https://e5l5aptdy4.execute-api.us-east-1.amazonaws.com/test/play');
-//       const data = await response.json();
-//       alert("Player has been register");
-//       console.log(data);
-//     } catch (error) {
-//       console.error('Error fetching data:', error);
-//     }
-//   };
-//   const handleLogin = (username) => {
-//     setUsername(username);
-//     setLoggedIn(true);
-//   };
-
-//   const handleLogout = () => {
-//     setUsername('');
-//     setLoggedIn(false);
-//   };
-
-//   return (
-//     <div className="app-container">
-//       {/* {loggedIn ? ( */}
-       
-//         <div>
-      
-//        <WebSocketComponent/>
-//         {/* <Container webSocketJsons={webSocketJson} /> */}
-//        </div>
-//       {
-//        // ) : (
-//       //   <Login onLogin={handleLogin} />
-    
-//       }
-
-
-   
-//     </div>
-//   );
-// };
-
-// export default App;
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
+import './App.css'; // Import CSS file
 import WebSocketComponent from './Temp/WebSocket';
-import React, { useEffect } from 'react'
-import { BrowserRouter,Routes, Route,Navigate  } from 'react-router-dom'
-import Home from './Component/Home';
-import Signup from './Component/Signup';
-import Login from './Component/Login';
-import Dashboard from './Component/Dashboard';
 
-import './App.css';
-import userpool from './UserPool';
+// Constants for OAuth
+const CLIENT_ID = '54ldo5nmo4818h35i1fjf3emuj';
+const REDIRECT_URI = 'http://localhost:3000/callback';
+const SCOPE = encodeURIComponent('openid https://api_userpool_resource_server.com/threats_read');
+const AUTHORIZE_URL = 'https://api-client.auth.us-east-1.amazoncognito.com/oauth2/authorize';
 
-function App() {
+const App = ({ accessToken }) => {
+  return (
+    <div className="app-container">
+      {accessToken ? (
+        <WebSocketComponent />
+      ) : (
+        <div>
+          <h1>Redirecting to Cognito...</h1>
+        </div>
+      )}
+    </div>
+  );
+};
 
-  useEffect(()=>{
-    let user=userpool.getCurrentUser();
-      if(user){
-        <Navigate to="/dashboard" replace />
-      }
-  },[]);
+const Callback = ({ onLogin }) => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const authorizationCode = urlParams.get('code');
+
+    if (authorizationCode) {
+      const fetchAccessToken = async () => {
+        const CLIENT_SECRET = '4bi0ba2ngnngul0nc3bilehc0pjteosl011fptdpsru69q28nsl';
+        const TOKEN_URL = 'https://api-client.auth.us-east-1.amazoncognito.com/oauth2/token';
+
+        const credentials = `${CLIENT_ID}:${CLIENT_SECRET}`;
+        const encodedCredentials = btoa(credentials);
+
+        const tokenData = {
+          grant_type: 'authorization_code',
+          code: authorizationCode,
+          client_id: CLIENT_ID,
+          redirect_uri: REDIRECT_URI,
+          scope: SCOPE,
+        };
+
+        const response = await fetch(TOKEN_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': `Basic ${encodedCredentials}`,
+          },
+          body: new URLSearchParams(tokenData),
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          onLogin(data.access_token);
+          navigate('/game');
+        } else {
+          console.error('Error fetching access token:', data);
+        }
+      };
+
+      fetchAccessToken();
+    }
+  }, [navigate, onLogin]);
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path='/' element={<Home />}/>
-        <Route path='/signup' element={<Signup />}/>
-        <Route path='/login' element={<Login />}/>
-        <Route path="/dashboard" element={<Dashboard/>}/>
-        <Route path="/start" element={<WebSocketComponent/>}/>
-      </Routes>
-    </BrowserRouter>
+    <div>
+      <h1>Logging in...</h1>
+    </div>
   );
-}
+};
 
-export default App;
+const Home = () => {
+  const handleStartGame = () => {
+    const authorizationUrl = `${AUTHORIZE_URL}?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=${SCOPE}`;
+    window.location.href = authorizationUrl;
+  };
+
+  return (
+    <div className="home-container">
+      <h1>Welcome to the Cybersecurity Game</h1>
+      <button onClick={handleStartGame}>Start Game</button>
+    </div>
+  );
+};
+
+const AppWrapper = () => {
+  const [accessToken, setAccessToken] = useState(localStorage.getItem('accessToken'));
+
+  const handleLogin = (accessToken) => {
+    setAccessToken(accessToken);
+    localStorage.setItem('accessToken', accessToken);
+  };
+
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/callback" element={<Callback onLogin={handleLogin} />} />
+        <Route path="/game" element={<App accessToken={accessToken} />} />
+      </Routes>
+    </Router>
+  );
+};
+
+export default AppWrapper;
