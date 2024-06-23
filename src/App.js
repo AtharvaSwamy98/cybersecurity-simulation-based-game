@@ -6,7 +6,7 @@ import WebSocketComponent from './Temp/WebSocket';
 // Constants for OAuth
 const CLIENT_ID = '54ldo5nmo4818h35i1fjf3emuj';
 const REDIRECT_URI = 'http://localhost:3000/callback';
-const SCOPE = encodeURIComponent('openid https://api_userpool_resource_server.com/threats_read');
+const SCOPE = encodeURIComponent('https://api_userpool_resource_server.com/Read');
 const AUTHORIZE_URL = 'https://api-client.auth.us-east-1.amazoncognito.com/oauth2/authorize';
 
 const App = ({ accessToken }) => {

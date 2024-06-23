@@ -1,3 +1,8 @@
+# Introduction
+
+This game is part of a Disseration, which is a cybersecurity based decision making game. 
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

@@ -8,7 +8,7 @@ const Auth = () => {
   const AUTHORIZE_URL = 'https://api-client.auth.us-east-1.amazoncognito.com/oauth2/authorize';
   const TOKEN_URL = 'https://api-client.auth.us-east-1.amazoncognito.com/oauth2/token';
   const CLIENT_SECRET = '4bi0ba2ngnngul0nc3bilehc0pjteosl011fptdpsru69q28nsl';
-  const scope = encodeURIComponent('openid https://api_userpool_resource_server.com/threats_read');
+  const scope = encodeURIComponent('https://api_userpool_resource_server.com/Read');
   const COGNITO_LOGOUT_URL = 'https://api-client.auth.us-east-1.amazoncognito.com/oauth2/revoke';
 
   const location = useLocation();
